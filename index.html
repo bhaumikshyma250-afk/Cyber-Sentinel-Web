@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Sentinel AI | Threat Defense Console</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#0B0F19',
+                            card: '#111827',
+                            border: '#1F2937',
+                            accent: '#06B6D4'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#0B0F19] text-slate-100 min-h-screen font-sans antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-[#0F172A]/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    🛡️
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-2">
+                        Cyber Sentinel Ai <span class="text-xs bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800/60 font-mono">v1.2 AI</span>
+                    </h1>
+                    <p class="text-[11px] text-gray-400">Heuristic & Machine Learning Defense Engine</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-mono">
+                <span class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/50 border border-emerald-800/60 text-emerald-400">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Engine Online
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+
+        <!-- Metrics Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-[#111827] border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-gray-400 uppercase font-semibold tracking-wider">Detection Logic</div>
+                    <div class="text-sm font-semibold text-gray-200 mt-1">Dual: Heuristic + NLP</div>
+                </div>
+                <span class="text-cyan-400 text-xl">⚡</span>
+            </div>
+            <div class="bg-[#111827] border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-gray-400 uppercase font-semibold tracking-wider">Target Scope</div>
+                    <div class="text-sm font-semibold text-gray-200 mt-1">SMS, URLs, Malicious Links</div>
+                </div>
+                <span class="text-cyan-400 text-xl">🌐</span>
+            </div>
+            <div class="bg-[#111827] border border-gray-800 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-gray-400 uppercase font-semibold tracking-wider">Storage Audit</div>
+                    <div class="text-sm font-semibold text-gray-200 mt-1">SQLite Logging Engine</div>
+                </div>
+                <span class="text-cyan-400 text-xl">🗄️</span>
+            </div>
+        </div>
+
+        <!-- Scanning Interface (2-Col Grid) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Input Panel -->
+            <div class="lg:col-span-7 bg-[#111827] border border-gray-800 rounded-2xl p-6 shadow-xl space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-200 mb-1">Inspect Payload / Message</label>
+                    <p class="text-xs text-gray-400 mb-3">Paste any incoming SMS, shortened links, or suspicious URL to analyze.</p>
+                    
+                    <textarea id="inputText" rows="5"
+                        class="w-full bg-[#0B0F19] border border-gray-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl p-3.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none transition duration-150 resize-none"
+                        placeholder="Paste suspicious text or link here... (e.g., URGENT: Verify bank account http://bit.ly/bank)"></textarea>
+                </div>
+
+                <!-- 1-Click Samples -->
+                <div class="space-y-2">
+                    <span class="text-[11px] text-gray-400 uppercase font-semibold tracking-wider">Quick Test Samples:</span>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button onclick="setSample('phish')" class="bg-gray-800/80 hover:bg-gray-700 text-gray-300 px-2.5 py-1.5 rounded-lg border border-gray-700/80 transition">
+                            🚨 Bank Phishing Link
+                        </button>
+                        <button onclick="setSample('shortener')" class="bg-gray-800/80 hover:bg-gray-700 text-gray-300 px-2.5 py-1.5 rounded-lg border border-gray-700/80 transition">
+                            🔗 Shortened URL
+                        </button>
+                        <button onclick="setSample('safe')" class="bg-gray-800/80 hover:bg-gray-700 text-gray-300 px-2.5 py-1.5 rounded-lg border border-gray-700/80 transition">
+                            ✅ Safe SMS Message
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="runScan()" id="scanBtn"
+                    class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-medium py-3 rounded-xl shadow-lg shadow-cyan-900/30 active:scale-[0.99] transition duration-150 flex items-center justify-center gap-2">
+                    <span>Analyze Threat Pattern</span>
+                </button>
+            </div>
+
+            <!-- Threat Output Panel -->
+            <div class="lg:col-span-5 bg-[#111827] border border-gray-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-200 border-b border-gray-800 pb-3 flex items-center justify-between">
+                        <span>Threat Intelligence Output</span>
+                        <span id="threatLevel" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-gray-800 text-gray-400">STANDBY</span>
+                    </h3>
+
+                    <!-- Score Meter -->
+                    <div class="my-6">
+                        <div class="flex items-baseline justify-between mb-2">
+                            <span class="text-xs text-gray-400 font-mono">Calculated Risk Index</span>
+                            <div class="text-3xl font-extrabold font-mono text-white tracking-tight">
+                                <span id="threatScore">0</span><span class="text-sm text-gray-500">/100</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-800 rounded-full h-2.5 overflow-hidden">
+                            <div id="threatBar" class="bg-gray-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mitigation -->
+                    <div class="bg-[#0B0F19] border border-gray-800 rounded-xl p-3.5 space-y-1 mb-4">
+                        <div class="text-[11px] text-gray-400 uppercase font-semibold">Recommended Mitigation</div>
+                        <div id="threatAction" class="text-sm font-semibold text-gray-300">Ready for inspection. Awaiting incoming payload.</div>
+                    </div>
+
+                    <!-- Heuristic Flags -->
+                    <div class="space-y-1.5">
+                        <div class="text-[11px] text-gray-400 uppercase font-semibold">Detected Heuristic Signatures</div>
+                        <div id="threatFlags" class="text-xs font-mono bg-[#0B0F19] border border-gray-800 p-2.5 rounded-xl text-cyan-300 min-h-[44px] flex items-center flex-wrap gap-1">
+                            <span class="text-gray-500">None detected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-gray-500 border-t border-gray-800 pt-3 mt-4 text-center">
+                    Scans are verified and audited into <code class="text-gray-400">sentinel.db</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database History Table Panel -->
+        <div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-200">Real-time Inspection Logs</h3>
+                    <p class="text-xs text-gray-400">Audited records stored directly in SQLite database</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="fetchLogs()" class="text-xs text-cyan-400 hover:text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-800/80 px-3 py-1.5 rounded-lg transition font-mono flex items-center gap-1.5">
+                        <span>↻</span> Refresh History
+                    </button>
+                    <button onclick="clearLogs()" class="text-xs text-red-400 hover:text-red-300 bg-red-950/60 hover:bg-red-900/60 border border-red-800/80 px-3 py-1.5 rounded-lg transition font-mono flex items-center gap-1.5">
+                        <span>🗑</span> Clear History
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-gray-400 uppercase font-mono text-[11px]">
+                            <th class="py-3 px-3">Timestamp</th>
+                            <th class="py-3 px-3">Inspected Payload</th>
+                            <th class="py-3 px-3">Score</th>
+                            <th class="py-3 px-3">Risk Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody" class="divide-y divide-gray-800/60 font-mono text-gray-300">
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-gray-500">No logs found in database.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const samples = {
+            phish: "URGENT: Your State Bank KYC is expired. Update immediately at http://verify-sbi-portal.xyz to prevent card block.",
+            shortener: "Check the updated semester timetable here: https://bit.ly/cst-exam-routine",
+            safe: "Hey, are we attending the CST programming lab at 10 AM tomorrow?"
+        };
+
+        function setSample(type) {
+            document.getElementById("inputText").value = samples[type];
+        }
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch("/api/logs");
+                const logs = await res.json();
+                const body = document.getElementById("logsBody");
+
+                if (!logs || logs.length === 0) {
+                    body.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-gray-500">No logs recorded yet.</td></tr>`;
+                    return;
+                }
+
+                body.innerHTML = logs.map(l => `
+                    <tr class="hover:bg-gray-800/40 transition">
+                        <td class="py-3 px-3 text-gray-400 whitespace-nowrap">${l.time}</td>
+                        <td class="py-3 px-3 text-gray-200 truncate max-w-xs font-sans">${l.text}</td>
+                        <td class="py-3 px-3 font-bold">${l.score}</td>
+                        <td class="py-3 px-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                                l.level === 'CRITICAL THREAT' 
+                                ? 'bg-red-950 text-red-400 border border-red-800' 
+                                : (l.level === 'SUSPICIOUS' 
+                                    ? 'bg-amber-950 text-amber-400 border border-amber-800' 
+                                    : 'bg-emerald-950 text-emerald-400 border border-emerald-800')
+                            }">
+                                ${l.level}
+                            </span>
+                        </td>
+                    </tr>
+                `).join("");
+            } catch (err) {
+                console.error("Failed fetching database logs:", err);
+            }
+        }
+
+        async function clearLogs() {
+            if (!confirm("Are you sure you want to permanently clear all scan logs from the database?")) {
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/logs", { method: "DELETE" });
+                const result = await res.json();
+                if (result.status === "success") {
+                    fetchLogs();
+                }
+            } catch (err) {
+                alert("Failed to clear database logs.");
+            }
+        }
+
+        async function runScan() {
+            const input = document.getElementById("inputText");
+            const text = input.value.trim();
+            if (!text) {
+                alert("Please paste text or URL to scan.");
+                return;
+            }
+
+            const btn = document.getElementById("scanBtn");
+            btn.innerHTML = "<span>Analyzing Signature...</span>";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch("/api/scan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text })
+                });
+                const data = await res.json();
+
+                const threatScore = document.getElementById("threatScore");
+                const threatLevel = document.getElementById("threatLevel");
+                const threatAction = document.getElementById("threatAction");
+                const threatFlags = document.getElementById("threatFlags");
+                const threatBar = document.getElementById("threatBar");
+
+                threatScore.innerText = data.score;
+                threatLevel.innerText = data.level;
+                threatAction.innerText = data.action;
+                threatBar.style.width = data.score + "%";
+
+                if (data.color === "red") {
+                    threatBar.className = "bg-red-500 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
+                    threatLevel.className = "text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-red-950 text-red-300 border border-red-800";
+                    threatAction.className = "text-sm font-semibold text-red-300";
+                } else if (data.color === "yellow") {
+                    threatBar.className = "bg-amber-400 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(251,191,36,0.5)]";
+                    threatLevel.className = "text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-amber-950 text-amber-300 border border-amber-800";
+                    threatAction.className = "text-sm font-semibold text-amber-300";
+                } else {
+                    threatBar.className = "bg-emerald-400 h-2.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(52,211,153,0.5)]";
+                    threatLevel.className = "text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-emerald-950 text-emerald-300 border border-emerald-800";
+                    threatAction.className = "text-sm font-semibold text-emerald-300";
+                }
+
+                threatFlags.innerHTML = data.flags.map(f => `
+                    <span class="bg-gray-800 border border-gray-700 text-cyan-300 px-2 py-0.5 rounded text-[11px]">
+                        ${f}
+                    </span>
+                `).join("");
+
+                fetchLogs();
+
+            } catch (err) {
+                alert("Inspection server error. Please verify backend is running.");
+            } finally {
+                btn.innerHTML = "<span>Analyze Threat Pattern</span>";
+                btn.disabled = false;
+            }
+        }
+
+        fetchLogs();
+    </script>
+</body>
+</html>
