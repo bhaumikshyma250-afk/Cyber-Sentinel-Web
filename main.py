@@ -12,11 +12,13 @@ from sklearn.naive_bayes import MultinomialNB
 
 app = FastAPI(title="Cyber Sentinel AI")
 
-# Dynamic template directory resolution
+# --- DYNAMIC TEMPLATE PATH RESOLUTION ---
+# Render-e index.html templates folder-e thakuk ba root-e thakuk, shob khetre kaj korbe
 BASE_DIR = Path(__file__).resolve().parent
 template_dir = BASE_DIR / "templates"
-if not template_dir.exists():
-    template_dir = BASE_DIR / "templetes"
+
+if not template_dir.exists() or not (template_dir / "index.html").exists():
+    template_dir = BASE_DIR
 
 templates = Jinja2Templates(directory=str(template_dir))
 DB_PATH = BASE_DIR / "sentinel.db"
