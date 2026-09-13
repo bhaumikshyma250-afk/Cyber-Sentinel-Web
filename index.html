@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyber Sentinel AI | Threat Defense Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    boxShadow: {
+                        'glow-cyan': '0 0 20px rgba(34, 211, 238, 0.25)',
+                        'glow-purple': '0 0 25px rgba(167, 139, 250, 0.3)',
+                        'glow-pink': '0 0 20px rgba(244, 114, 182, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(ellipse at top, #0F1A2E 0%, #060B18 50%, #030712 100%);
+            min-height: 100vh;
+        }
+        .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0D1526; }
+        ::-webkit-scrollbar-thumb { background: #22D3EE55; border-radius: 3px; }
+        .glass {
+            background: linear-gradient(135deg, rgba(13, 21, 38, 0.9) 0%, rgba(15, 26, 46, 0.85) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(34, 211, 238, 0.12);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #22D3EE, #A78BFA, #F472B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glow-border { position: relative; }
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #22D3EE55, #A78BFA44, #F472B644);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        @keyframes soft-pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+            50% { opacity: 0.85; box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+        }
+        .online-dot { animation: soft-pulse 2s infinite; }
+
+        /* ===== MOBILE FIXES ===== */
+        @media (max-width: 640px) {
+            button, .touch-target { min-height: 44px; }
+
+            /* Header - no overflow, clean layout */
+            .header-bar {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+                gap: 8px !important;
+            }
+            .header-title {
+                font-size: 13px !important;
+            }
+            .header-sub {
+                font-size: 9px !important;
+                max-width: 140px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .header-logo {
+                height: 36px !important;
+                width: 36px !important;
+                font-size: 16px !important;
+            }
+            .header-badge {
+                font-size: 9px !important;
+                padding: 2px 6px !important;
+            }
+            .status-btn {
+                padding: 6px 10px !important;
+                font-size: 10px !important;
+            }
+
+            /* Metric cards */
+            .metric-card {
+                padding: 14px 16px !important;
+                min-height: 72px;
+            }
+            .metric-value {
+                font-size: 13px !important;
+                line-height: 1.3;
+                white-space: normal !important;
+            }
+        }
+
+        #infoModal.hidden { display: none !important; }
+        #infoModal { display: flex; }
+    </style>
+</head>
+<body class="text-slate-100 antialiased selection:bg-cyan-500/40 selection:text-white">
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div class="absolute -top-32 -left-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/3 -right-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 left-1/4 w-72 h-72 bg-pink-500/8 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- ===== HEADER (mobile fixed) ===== -->
+    <header class="sticky top-0 z-50 border-b border-cyan-500/10 bg-[#060B18]/90 backdrop-blur-xl">
+        <div class="header-bar max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+            <!-- Left: Logo + Title -->
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="header-logo h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 flex items-center justify-center text-xl shadow-glow-cyan shrink-0">
+                    🛡️
+                </div>
+                <div class="min-w-0">
+                    <h1 class="header-title font-bold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5 flex-wrap">
+                        <span class="text-gradient">Cyber Sentinel</span>
+                        <span class="header-badge text-[10px] sm:text-xs bg-gradient-to-r from-cyan-950 to-purple-950 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-500/30 font-mono">v1.2 AI</span>
+                    </h1>
+                    <p class="header-sub text-[10px] sm:text-[11px] text-slate-400">Heuristic & ML Defense Engine</p>
+                </div>
+            </div>
+            <!-- Right: Status buttons -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="toggleAutoDetection()" id="autoDetectBtn"
+                    class="status-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all duration-300 border-cyan-500/40 bg-cyan-500/10 text-cyan-300 active:scale-95">
+                    <span id="autoDetectDot" class="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shrink-0"></span>
+                    <span id="autoDetectLabel" class="text-[10px] sm:text-xs font-mono hidden xs:inline sm:inline">Auto</span>
+                </button>
+                <span class="status-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 online-dot shrink-0"></span>
+                    <span class="text-[10px] sm:text-xs font-mono hidden sm:inline">Online</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-3 sm:px-6 py-5 sm:py-8 space-y-4 sm:space-y-6">
+
+        <!-- ===== METRICS (clickable) ===== -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button type="button" onclick="showInfo('detection')"
+                class="metric-card glass rounded-2xl p-4 flex items-center justify-between gap-3 glow-border active:scale-[0.97] transition-all cursor-pointer text-left w-full">
+                <div class="min-w-0 flex-1">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Detection Logic</div>
+                    <div class="metric-value text-sm font-semibold text-white mt-1">Heuristic + NLP</div>
+                </div>
+                <div class="h-11 w-11 shrink-0 rounded-xl bg-cyan-500/15 flex items-center justify-center text-cyan-400 text-lg">⚡</div>
+            </button>
+            <button type="button" onclick="showInfo('scope')"
+                class="metric-card glass rounded-2xl p-4 flex items-center justify-between gap-3 glow-border active:scale-[0.97] transition-all cursor-pointer text-left w-full">
+                <div class="min-w-0 flex-1">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Target Scope</div>
+                    <div class="metric-value text-sm font-semibold text-white mt-1">SMS · URLs · Clipboard</div>
+                </div>
+                <div class="h-11 w-11 shrink-0 rounded-xl bg-purple-500/15 flex items-center justify-center text-purple-400 text-lg">🌐</div>
+            </button>
+            <button type="button" onclick="showInfo('storage')"
+                class="metric-card glass rounded-2xl p-4 flex items-center justify-between gap-3 glow-border active:scale-[0.97] transition-all cursor-pointer text-left w-full">
+                <div class="min-w-0 flex-1">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Storage Audit</div>
+                    <div class="metric-value text-sm font-semibold text-white mt-1">SQLite Engine</div>
+                </div>
+                <div class="h-11 w-11 shrink-0 rounded-xl bg-pink-500/15 flex items-center justify-center text-pink-400 text-lg">🗄️</div>
+            </button>
+        </div>
+
+        <!-- ===== SCAN + OUTPUT ===== -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+            <div class="lg:col-span-7 glass rounded-2xl p-4 sm:p-6 space-y-4 glow-border">
+                <div>
+                    <div class="flex flex-wrap justify-between items-center gap-2 mb-1">
+                        <label class="text-sm font-semibold text-white">Inspect Payload / Message</label>
+                        <span id="autoIndicator" class="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">⚡ MONITORING</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3">Paste text or copy suspicious SMS/links — auto-scans when enabled.</p>
+                    <textarea id="inputText" rows="5"
+                        class="w-full bg-[#060B18]/80 border border-slate-700/60 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-500/20 rounded-2xl p-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none leading-relaxed"
+                        placeholder="Paste suspicious text or link here..."></textarea>
+                </div>
+                <div class="space-y-2">
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Quick Test Samples</span>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="setSample('phish')"
+                            class="touch-target bg-red-500/15 text-red-300 px-3 py-2 rounded-xl border border-red-500/25 text-xs font-medium active:scale-95">
+                            🚨 Bank Phishing
+                        </button>
+                        <button type="button" onclick="setSample('shortener')"
+                            class="touch-target bg-amber-500/15 text-amber-300 px-3 py-2 rounded-xl border border-amber-500/25 text-xs font-medium active:scale-95">
+                            🔗 Shortened URL
+                        </button>
+                        <button type="button" onclick="setSample('safe')"
+                            class="touch-target bg-emerald-500/15 text-emerald-300 px-3 py-2 rounded-xl border border-emerald-500/25 text-xs font-medium active:scale-95">
+                            ✅ Safe Message
+                        </button>
+                    </div>
+                </div>
+                <button type="button" onclick="runScan()" id="scanBtn"
+                    class="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-cyan-500/25 active:scale-[0.98] transition text-sm">
+                    Analyze Threat Pattern
+                </button>
+            </div>
+
+            <div class="lg:col-span-5 glass rounded-2xl p-4 sm:p-6 flex flex-col glow-border">
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-white border-b border-slate-700/50 pb-3 flex items-center justify-between gap-2">
+                        <span>Threat Intelligence</span>
+                        <span id="threatLevel" class="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-800/80 text-slate-400 border border-slate-700">STANDBY</span>
+                    </h3>
+                    <div class="my-5">
+                        <div class="flex items-end justify-between mb-2">
+                            <span class="text-[11px] text-slate-400 font-mono">Risk Index</span>
+                            <div class="text-3xl font-extrabold font-mono">
+                                <span id="threatScore" class="text-white">0</span><span class="text-sm text-slate-500">/100</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-800/80 rounded-full h-3 overflow-hidden border border-slate-700/50">
+                            <div id="threatBar" class="h-3 rounded-full transition-all duration-700 bg-slate-600" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-[#060B18]/70 border border-slate-700/50 rounded-2xl p-3.5 mb-4">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Recommended Action</div>
+                        <div id="threatAction" class="text-sm font-medium text-slate-300 mt-1">Ready for inspection.</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1.5">Heuristic Signatures</div>
+                        <div id="threatFlags" class="text-xs font-mono bg-[#060B18]/70 border border-slate-700/50 p-3 rounded-2xl text-cyan-300 min-h-[48px] flex flex-wrap gap-1.5 items-center">
+                            <span class="text-slate-500">None detected</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-[10px] text-slate-500 border-t border-slate-700/50 pt-3 mt-4 text-center">
+                    Audited into <code class="text-cyan-400/80 font-mono">sentinel.db</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LOGS ===== -->
+        <div class="glass rounded-2xl p-4 sm:p-6 space-y-4 glow-border">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-semibold text-white">Real-time Inspection Logs</h3>
+                    <p class="text-xs text-slate-400">SQLite audit trail</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fetchLogs()"
+                        class="touch-target text-xs text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-3 py-2 rounded-xl font-mono active:scale-95">↻ Refresh</button>
+                    <button type="button" onclick="clearLogs()"
+                        class="touch-target text-xs text-red-300 bg-red-500/10 border border-red-500/30 px-3 py-2 rounded-xl font-mono active:scale-95">🗑 Clear</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto rounded-xl">
+                <table class="w-full text-left text-xs min-w-[460px]">
+                    <thead>
+                        <tr class="border-b border-slate-700/60 text-slate-400 uppercase font-mono text-[10px]">
+                            <th class="py-3 px-3">Timestamp</th>
+                            <th class="py-3 px-3">Payload</th>
+                            <th class="py-3 px-3">Score</th>
+                            <th class="py-3 px-3">Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody" class="divide-y divide-slate-800/60 font-mono text-slate-300">
+                        <tr><td colspan="4" class="py-8 text-center text-slate-500">No logs found.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="max-w-6xl mx-auto px-4 py-5 text-center text-[10px] text-slate-600">
+        Cyber Sentinel AI · Heuristic + ML Defense Engine
+    </footer>
+
+    <!-- Modal -->
+    <div id="infoModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+         onclick="if(event.target===this)closeInfo()">
+        <div class="glass rounded-2xl p-5 max-w-md w-full shadow-2xl border border-cyan-500/20 relative" onclick="event.stopPropagation()">
+            <button type="button" onclick="closeInfo()" class="absolute top-3 right-3 h-8 w-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-sm">✕</button>
+            <div id="infoModalIcon" class="h-12 w-12 rounded-xl flex items-center justify-center text-2xl mb-4 bg-cyan-500/20 text-cyan-400">⚡</div>
+            <h3 id="infoModalTitle" class="text-lg font-bold text-white mb-2">Title</h3>
+            <p id="infoModalBody" class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">Body</p>
+        </div>
+    </div>
+
+    <script>
+        let autoDetectionEnabled = true;
+        let lastScannedPayload = "";
+
+        const samples = {
+            phish: "URGENT: Your State Bank KYC is expired. Update immediately at http://verify-sbi-portal.xyz to prevent card block.",
+            shortener: "Check the updated semester timetable here: https://bit.ly/cst-exam-routine",
+            safe: "Hey, are we attending the CST programming lab at 10 AM tomorrow?"
+        };
+
+        const infoData = {
+            detection: {
+                icon: "⚡", iconBg: "bg-cyan-500/20 text-cyan-400",
+                title: "Detection Logic",
+                body: "Dual-layer engine:\n• Heuristic rules (urgency, banking terms, suspicious TLDs, shorteners)\n• ML classifier (TF-IDF + Naive Bayes)\n\nScore 0–100 → SAFE / SUSPICIOUS / CRITICAL THREAT"
+            },
+            scope: {
+                icon: "🌐", iconBg: "bg-purple-500/20 text-purple-400",
+                title: "Target Scope",
+                body: "Monitors:\n• SMS / text messages\n• URLs & shortened links\n• Clipboard (auto-scan when Auto is ON)"
+            },
+            storage: {
+                icon: "🗄️", iconBg: "bg-pink-500/20 text-pink-400",
+                title: "Storage Audit",
+                body: "Every scan saved in local SQLite (sentinel.db).\n\nRefresh → view logs\nClear → delete all records\n\nNo data leaves your machine."
+            }
+        };
+
+        function showInfo(key) {
+            var d = infoData[key];
+            if (!d) return;
+            var modal = document.getElementById("infoModal");
+            document.getElementById("infoModalIcon").className = "h-12 w-12 rounded-xl flex items-center justify-center text-2xl mb-4 " + d.iconBg;
+            document.getElementById("infoModalIcon").textContent = d.icon;
+            document.getElementById("infoModalTitle").textContent = d.title;
+            document.getElementById("infoModalBody").textContent = d.body;
+            modal.classList.remove("hidden");
+            modal.style.display = "flex";
+        }
+
+        function closeInfo() {
+            var modal = document.getElementById("infoModal");
+            modal.classList.add("hidden");
+            modal.style.display = "none";
+        }
+
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") closeInfo();
+        });
+
+        function toggleAutoDetection() {
+            autoDetectionEnabled = !autoDetectionEnabled;
+            var btn = document.getElementById("autoDetectBtn");
+            var dot = document.getElementById("autoDetectDot");
+            var label = document.getElementById("autoDetectLabel");
+            var ind = document.getElementById("autoIndicator");
+            if (autoDetectionEnabled) {
+                btn.className = "status-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all border-cyan-500/40 bg-cyan-500/10 text-cyan-300 active:scale-95";
+                dot.className = "h-2 w-2 rounded-full bg-cyan-400 animate-pulse shrink-0";
+                if (label) label.innerText = "Auto";
+                ind.innerText = "⚡ MONITORING";
+                ind.className = "text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20";
+            } else {
+                btn.className = "status-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all border-slate-600 bg-slate-800/50 text-slate-400 active:scale-95";
+                dot.className = "h-2 w-2 rounded-full bg-slate-500 shrink-0";
+                if (label) label.innerText = "Off";
+                ind.innerText = "⚪ PAUSED";
+                ind.className = "text-[10px] font-mono text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded-md border border-slate-700";
+            }
+        }
+
+        async function checkClipboardPayload() {
+            if (!autoDetectionEnabled) return;
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    var text = await navigator.clipboard.readText();
+                    var clean = text ? text.trim() : "";
+                    if (clean.length > 5 && clean !== lastScannedPayload) {
+                        document.getElementById("inputText").value = clean;
+                        lastScannedPayload = clean;
+                        runScan();
+                    }
+                }
+            } catch (e) {}
+        }
+        window.addEventListener("focus", checkClipboardPayload);
+        setInterval(function() { if (document.hasFocus()) checkClipboardPayload(); }, 3000);
+
+        function setSample(type) {
+            document.getElementById("inputText").value = samples[type];
+            runScan();
+        }
+
+        async function fetchLogs() {
+            try {
+                var res = await fetch("/api/logs");
+                var logs = await res.json();
+                var body = document.getElementById("logsBody");
+                if (!logs || !logs.length) {
+                    body.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-500">No logs found.</td></tr>';
+                    return;
+                }
+                body.innerHTML = logs.map(function(l) {
+                    var cls = l.level === "CRITICAL THREAT" ? "bg-red-500/15 text-red-400 border-red-500/30"
+                        : l.level === "SUSPICIOUS" ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                        : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
+                    return '<tr class="hover:bg-slate-800/40">' +
+                        '<td class="py-3 px-3 text-slate-400 whitespace-nowrap text-[11px]">' + l.time + '</td>' +
+                        '<td class="py-3 px-3 text-slate-200 truncate max-w-[120px] sm:max-w-xs font-sans text-[11px]">' + l.text + '</td>' +
+                        '<td class="py-3 px-3 font-bold">' + l.score + '</td>' +
+                        '<td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ' + cls + '">' + l.level + '</span></td></tr>';
+                }).join("");
+            } catch (e) { console.error(e); }
+        }
+
+        async function clearLogs() {
+            if (!confirm("Clear all scan logs?")) return;
+            try {
+                var res = await fetch("/api/logs", { method: "DELETE" });
+                var r = await res.json();
+                if (r.status === "success") fetchLogs();
+            } catch (e) { alert("Failed to clear logs."); }
+        }
+
+        async function runScan() {
+            var text = document.getElementById("inputText").value.trim();
+            if (!text) { alert("Please paste text or URL to scan."); return; }
+            lastScannedPayload = text;
+            var btn = document.getElementById("scanBtn");
+            btn.innerHTML = "Analyzing...";
+            btn.disabled = true;
+            try {
+                var res = await fetch("/api/scan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text })
+                });
+                var data = await res.json();
+                document.getElementById("threatScore").innerText = data.score;
+                document.getElementById("threatLevel").innerText = data.level;
+                document.getElementById("threatAction").innerText = data.action;
+                document.getElementById("threatBar").style.width = data.score + "%";
+
+                var bar = document.getElementById("threatBar");
+                var lvl = document.getElementById("threatLevel");
+                var act = document.getElementById("threatAction");
+
+                if (data.color === "red") {
+                    bar.className = "h-3 rounded-full transition-all duration-700 bg-gradient-to-r from-red-500 to-rose-400";
+                    lvl.className = "text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40";
+                    act.className = "text-sm font-medium text-red-300 mt-1";
+                } else if (data.color === "yellow") {
+                    bar.className = "h-3 rounded-full transition-all duration-700 bg-gradient-to-r from-amber-400 to-yellow-300";
+                    lvl.className = "text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40";
+                    act.className = "text-sm font-medium text-amber-300 mt-1";
+                } else {
+                    bar.className = "h-3 rounded-full transition-all duration-700 bg-gradient-to-r from-emerald-400 to-green-300";
+                    lvl.className = "text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                    act.className = "text-sm font-medium text-emerald-300 mt-1";
+                }
+
+                document.getElementById("threatFlags").innerHTML = (data.flags || []).map(function(f) {
+                    return '<span class="bg-slate-800/80 border border-cyan-500/20 text-cyan-300 px-2 py-1 rounded-lg text-[10px]">' + f + '</span>';
+                }).join("");
+                fetchLogs();
+            } catch (e) {
+                alert("Server error. Is backend running?");
+            } finally {
+                btn.innerHTML = "Analyze Threat Pattern";
+                btn.disabled = false;
+            }
+        }
+
+        fetchLogs();
+    </script>
+</body>
+</html>
