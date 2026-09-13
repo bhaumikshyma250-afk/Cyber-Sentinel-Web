@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyber Sentinel AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #060B18;
+            margin: 0;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .glass {
+            background: rgba(13, 21, 38, 0.92);
+            border: 1px solid rgba(34, 211, 238, 0.12);
+        }
+        .text-grad {
+            background: linear-gradient(135deg, #22D3EE, #A78BFA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .pulse { animation: pulse-dot 1.5s infinite; }
+
+        /* ===== MOBILE HEADER FIX ===== */
+        .hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            gap: 8px;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.1);
+            background: rgba(6, 11, 24, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+        }
+        .hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+        .hdr-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(34, 211, 238, 0.12);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .hdr-text { min-width: 0; overflow: hidden; }
+        .hdr-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hdr-badge {
+            font-size: 9px;
+            font-family: monospace;
+            background: rgba(6, 182, 212, 0.15);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 4px;
+            padding: 1px 5px;
+            flex-shrink: 0;
+        }
+        .hdr-sub {
+            font-size: 9px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 1px;
+        }
+        .hdr-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-family: monospace;
+            border: 1px solid;
+            white-space: nowrap;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .status-pill .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 640px) {
+            .hdr { padding: 12px 24px; gap: 12px; }
+            .hdr-logo { width: 42px; height: 42px; font-size: 20px; border-radius: 12px; }
+            .hdr-title { font-size: 15px; }
+            .hdr-badge { font-size: 10px; padding: 2px 7px; }
+            .hdr-sub { font-size: 11px; }
+            .status-pill { padding: 6px 12px; font-size: 11px; gap: 6px; }
+            .status-pill .dot { width: 8px; height: 8px; }
+        }
+
+        .card {
+            background: rgba(13, 21, 38, 0.92);
+            border: 1px solid rgba(34, 211, 238, 0.12);
+            border-radius: 16px;
+            padding: 14px 16px;
+        }
+        .metric-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            border: 1px solid rgba(34, 211, 238, 0.12);
+            background: rgba(13, 21, 38, 0.92);
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: inherit;
+            min-height: 70px;
+        }
+        .metric-btn:active { transform: scale(0.97); opacity: 0.9; }
+        .metric-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .btn-main {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-main:active { opacity: 0.85; }
+        .btn-main:disabled { opacity: 0.6; }
+        textarea {
+            width: 100%;
+            background: rgba(6, 11, 24, 0.8);
+            border: 1px solid rgba(51, 65, 85, 0.6);
+            border-radius: 14px;
+            padding: 12px 14px;
+            color: #e2e8f0;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+        }
+        textarea:focus { border-color: rgba(34, 211, 238, 0.5); }
+        .sample-btn {
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            background: transparent;
+            color: inherit;
+        }
+        .sample-btn:active { transform: scale(0.96); }
+        #infoModal { display: none; }
+        #infoModal.open {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+        }
+        .modal-box {
+            background: rgba(13, 21, 38, 0.98);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 18px;
+            padding: 20px;
+            max-width: 380px;
+            width: 100%;
+            position: relative;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 10px 8px; color: #94a3b8; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid rgba(51,65,85,0.5); }
+        td { padding: 10px 8px; border-bottom: 1px solid rgba(30,41,59,0.5); }
+
+        @media (min-width: 640px) {
+            .metrics-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (min-width: 900px) {
+            .scan-grid { grid-template-columns: 1.2fr 0.8fr !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+    <div class="hdr-left">
+        <div class="hdr-logo">🛡️</div>
+        <div class="hdr-text">
+            <div class="hdr-title">
+                <span class="text-grad">Cyber Sentinel</span>
+                <span class="hdr-badge">v1.2 AI</span>
+            </div>
+            <div class="hdr-sub">Heuristic & ML Defense Engine</div>
+        </div>
+    </div>
+    <div class="hdr-right">
+        <button type="button" id="autoDetectBtn" class="status-pill" style="border-color:rgba(34,211,238,0.4);background:rgba(34,211,238,0.1);color:#67e8f9;" onclick="toggleAuto()">
+            <span id="autoDot" class="dot pulse" style="background:#22d3ee;"></span>
+            <span id="autoLabel">Auto</span>
+        </button>
+        <span class="status-pill" style="border-color:rgba(52,211,153,0.35);background:rgba(52,211,153,0.1);color:#6ee7b7;cursor:default;">
+            <span class="dot" style="background:#34d399;"></span>
+            <span>On</span>
+        </span>
+    </div>
+</header>
+
+<!-- MAIN -->
+<main style="max-width:1100px;margin:0 auto;padding:14px 12px 24px;">
+
+    <!-- Metrics -->
+    <div style="display:grid;gap:10px;margin-bottom:14px;" class="metrics-grid">
+        <button type="button" class="metric-btn" onclick="showInfo('detection')">
+            <div style="min-width:0;flex:1;">
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.04em;">Detection Logic</div>
+                <div style="font-size:13px;font-weight:600;color:#fff;margin-top:3px;">Heuristic + NLP</div>
+            </div>
+            <div class="metric-icon" style="background:rgba(34,211,238,0.12);">⚡</div>
+        </button>
+        <button type="button" class="metric-btn" onclick="showInfo('scope')">
+            <div style="min-width:0;flex:1;">
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.04em;">Target Scope</div>
+                <div style="font-size:13px;font-weight:600;color:#fff;margin-top:3px;">SMS · URLs · Clipboard</div>
+            </div>
+            <div class="metric-icon" style="background:rgba(167,139,250,0.12);">🌐</div>
+        </button>
+        <button type="button" class="metric-btn" onclick="showInfo('storage')">
+            <div style="min-width:0;flex:1;">
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.04em;">Storage Audit</div>
+                <div style="font-size:13px;font-weight:600;color:#fff;margin-top:3px;">SQLite Engine</div>
+            </div>
+            <div class="metric-icon" style="background:rgba(244,114,182,0.12);">🗄️</div>
+        </button>
+    </div>
+
+    <!-- Scan + Result -->
+    <div style="display:grid;gap:14px;" class="scan-grid">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+                <span style="font-size:13px;font-weight:600;color:#fff;">Inspect Payload / Message</span>
+                <span id="monitorBadge" style="font-size:10px;font-family:monospace;color:#67e8f9;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.2);padding:2px 8px;border-radius:6px;">⚡ MONITORING</span>
+            </div>
+            <p style="font-size:11px;color:#94a3b8;margin:0 0 10px;">Paste text or copy suspicious SMS/links — auto-scans when enabled.</p>
+            <textarea id="inputText" rows="5" placeholder="Paste suspicious text or link here..."></textarea>
+
+            <div style="margin-top:12px;">
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Quick Test Samples</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <button type="button" class="sample-btn" style="border-color:rgba(248,113,113,0.3);color:#fca5a5;background:rgba(248,113,113,0.1);" onclick="setSample('phish')">🚨 Bank Phishing</button>
+                    <button type="button" class="sample-btn" style="border-color:rgba(251,191,36,0.3);color:#fcd34d;background:rgba(251,191,36,0.1);" onclick="setSample('shortener')">🔗 Shortened URL</button>
+                    <button type="button" class="sample-btn" style="border-color:rgba(52,211,153,0.3);color:#6ee7b7;background:rgba(52,211,153,0.1);" onclick="setSample('safe')">✅ Safe Message</button>
+                </div>
+            </div>
+            <button type="button" class="btn-main" id="scanBtn" style="margin-top:14px;" onclick="runScan()">Analyze Threat Pattern</button>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column;">
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(51,65,85,0.4);padding-bottom:10px;">
+                <span style="font-size:13px;font-weight:600;color:#fff;">Threat Intelligence</span>
+                <span id="threatLevel" style="font-size:10px;font-family:monospace;font-weight:700;padding:3px 10px;border-radius:8px;background:rgba(30,41,59,0.8);color:#94a3b8;border:1px solid #334155;">STANDBY</span>
+            </div>
+            <div style="margin:16px 0;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
+                    <span style="font-size:11px;color:#94a3b8;font-family:monospace;">Risk Index</span>
+                    <div style="font-size:28px;font-weight:800;font-family:monospace;">
+                        <span id="threatScore" style="color:#fff;">0</span><span style="font-size:13px;color:#64748b;">/100</span>
+                    </div>
+                </div>
+                <div style="width:100%;height:10px;background:rgba(30,41,59,0.8);border-radius:999px;overflow:hidden;border:1px solid rgba(51,65,85,0.5);">
+                    <div id="threatBar" style="height:100%;width:0%;border-radius:999px;background:#475569;transition:width 0.6s ease;"></div>
+                </div>
+            </div>
+            <div style="background:rgba(6,11,24,0.7);border:1px solid rgba(51,65,85,0.4);border-radius:12px;padding:12px;margin-bottom:12px;">
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;">Recommended Action</div>
+                <div id="threatAction" style="font-size:13px;font-weight:500;color:#cbd5e1;margin-top:4px;">Ready for inspection.</div>
+            </div>
+            <div>
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;margin-bottom:6px;">Heuristic Signatures</div>
+                <div id="threatFlags" style="font-size:11px;font-family:monospace;background:rgba(6,11,24,0.7);border:1px solid rgba(51,65,85,0.4);border-radius:12px;padding:10px;min-height:44px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:#67e8f9;">
+                    <span style="color:#64748b;">None detected</span>
+                </div>
+            </div>
+            <div style="font-size:10px;color:#64748b;text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid rgba(51,65,85,0.4);">
+                Audited into <code style="color:#67e8f9;">sentinel.db</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs -->
+    <div class="card" style="margin-top:14px;">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
+            <div>
+                <div style="font-size:13px;font-weight:600;color:#fff;">Real-time Inspection Logs</div>
+                <div style="font-size:11px;color:#94a3b8;">SQLite audit trail</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button type="button" onclick="fetchLogs()" style="font-size:11px;font-family:monospace;color:#67e8f9;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.3);padding:7px 12px;border-radius:10px;cursor:pointer;">↻ Refresh</button>
+                <button type="button" onclick="clearLogs()" style="font-size:11px;font-family:monospace;color:#fca5a5;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);padding:7px 12px;border-radius:10px;cursor:pointer;">🗑 Clear</button>
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Payload</th>
+                        <th>Score</th>
+                        <th>Risk</th>
+                    </tr>
+                </thead>
+                <tbody id="logsBody">
+                    <tr><td colspan="4" style="text-align:center;padding:24px;color:#64748b;">No logs found.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer style="text-align:center;padding:16px;font-size:10px;color:#475569;">
+    Cyber Sentinel AI · Heuristic + ML Defense Engine
+</footer>
+
+<!-- Modal -->
+<div id="infoModal" onclick="if(event.target===this)closeInfo()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <button type="button" onclick="closeInfo()" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:#1e293b;border:none;color:#94a3b8;cursor:pointer;font-size:14px;">✕</button>
+        <div id="modalIcon" style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;background:rgba(34,211,238,0.15);">⚡</div>
+        <h3 id="modalTitle" style="font-size:17px;font-weight:700;color:#fff;margin:0 0 8px;">Title</h3>
+        <p id="modalBody" style="font-size:13px;color:#cbd5e1;line-height:1.6;margin:0;white-space:pre-line;">Body</p>
+    </div>
+</div>
+
+<script>
+var autoOn = true;
+var lastPayload = "";
+
+var samples = {
+    phish: "URGENT: Your State Bank KYC is expired. Update immediately at http://verify-sbi-portal.xyz to prevent card block.",
+    shortener: "Check the updated semester timetable here: https://bit.ly/cst-exam-routine",
+    safe: "Hey, are we attending the CST programming lab at 10 AM tomorrow?"
+};
+
+var infoMap = {
+    detection: { icon: "⚡", title: "Detection Logic", body: "Dual-layer engine:\n• Heuristic rules (urgency, banking terms, suspicious TLDs, shorteners)\n• ML classifier (TF-IDF + Naive Bayes)\n\nScore 0–100 → SAFE / SUSPICIOUS / CRITICAL THREAT" },
+    scope: { icon: "🌐", title: "Target Scope", body: "Monitors:\n• SMS / text messages\n• URLs & shortened links\n• Clipboard (auto-scan when Auto is ON)" },
+    storage: { icon: "🗄️", title: "Storage Audit", body: "Every scan saved in local SQLite (sentinel.db).\n\nRefresh → view logs\nClear → delete all records\n\nNo data leaves your machine." }
+};
+
+function showInfo(key) {
+    var d = infoMap[key];
+    if (!d) return;
+    document.getElementById("modalIcon").textContent = d.icon;
+    document.getElementById("modalTitle").textContent = d.title;
+    document.getElementById("modalBody").textContent = d.body;
+    document.getElementById("infoModal").className = "open";
+}
+function closeInfo() {
+    document.getElementById("infoModal").className = "";
+}
+document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeInfo(); });
+
+function toggleAuto() {
+    autoOn = !autoOn;
+    var btn = document.getElementById("autoDetectBtn");
+    var dot = document.getElementById("autoDot");
+    var label = document.getElementById("autoLabel");
+    var badge = document.getElementById("monitorBadge");
+    if (autoOn) {
+        btn.style.borderColor = "rgba(34,211,238,0.4)";
+        btn.style.background = "rgba(34,211,238,0.1)";
+        btn.style.color = "#67e8f9";
+        dot.style.background = "#22d3ee";
+        dot.className = "dot pulse";
+        label.textContent = "Auto";
+        badge.textContent = "⚡ MONITORING";
+        badge.style.color = "#67e8f9";
+        badge.style.background = "rgba(34,211,238,0.1)";
+        badge.style.borderColor = "rgba(34,211,238,0.2)";
+    } else {
+        btn.style.borderColor = "#475569";
+        btn.style.background = "rgba(30,41,59,0.5)";
+        btn.style.color = "#94a3b8";
+        dot.style.background = "#64748b";
+        dot.className = "dot";
+        label.textContent = "Off";
+        badge.textContent = "⚪ PAUSED";
+        badge.style.color = "#94a3b8";
+        badge.style.background = "rgba(30,41,59,0.5)";
+        badge.style.borderColor = "#475569";
+    }
+}
+
+async function checkClip() {
+    if (!autoOn) return;
+    try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            var t = (await navigator.clipboard.readText() || "").trim();
+            if (t.length > 5 && t !== lastPayload) {
+                document.getElementById("inputText").value = t;
+                lastPayload = t;
+                runScan();
+            }
+        }
+    } catch (e) {}
+}
+window.addEventListener("focus", checkClip);
+setInterval(function() { if (document.hasFocus()) checkClip(); }, 3000);
+
+function setSample(type) {
+    document.getElementById("inputText").value = samples[type];
+    runScan();
+}
+
+async function fetchLogs() {
+    try {
+        var res = await fetch("/api/logs");
+        var logs = await res.json();
+        var body = document.getElementById("logsBody");
+        if (!logs || !logs.length) {
+            body.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#64748b;">No logs found.</td></tr>';
+            return;
+        }
+        body.innerHTML = logs.map(function(l) {
+            var c = l.level === "CRITICAL THREAT" ? "background:rgba(248,113,113,0.15);color:#fca5a5;border:1px solid rgba(248,113,113,0.3)"
+                : l.level === "SUSPICIOUS" ? "background:rgba(251,191,36,0.15);color:#fcd34d;border:1px solid rgba(251,191,36,0.3)"
+                : "background:rgba(52,211,153,0.15);color:#6ee7b7;border:1px solid rgba(52,211,153,0.3)";
+            return '<tr><td style="color:#94a3b8;white-space:nowrap;font-size:11px;">' + l.time +
+                '</td><td style="color:#e2e8f0;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + l.text +
+                '</td><td style="font-weight:700;">' + l.score +
+                '</td><td><span style="padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;' + c + '">' + l.level + '</span></td></tr>';
+        }).join("");
+    } catch (e) { console.error(e); }
+}
+
+async function clearLogs() {
+    if (!confirm("Clear all scan logs?")) return;
+    try {
+        var res = await fetch("/api/logs", { method: "DELETE" });
+        var r = await res.json();
+        if (r.status === "success") fetchLogs();
+    } catch (e) { alert("Failed to clear."); }
+}
+
+async function runScan() {
+    var text = document.getElementById("inputText").value.trim();
+    if (!text) { alert("Please paste text or URL to scan."); return; }
+    lastPayload = text;
+    var btn = document.getElementById("scanBtn");
+    btn.textContent = "Analyzing...";
+    btn.disabled = true;
+    try {
+        var res = await fetch("/api/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text })
+        });
+        var data = await res.json();
+        document.getElementById("threatScore").textContent = data.score;
+        document.getElementById("threatLevel").textContent = data.level;
+        document.getElementById("threatAction").textContent = data.action;
+        document.getElementById("threatBar").style.width = data.score + "%";
+
+        var bar = document.getElementById("threatBar");
+        var lvl = document.getElementById("threatLevel");
+        var act = document.getElementById("threatAction");
+
+        if (data.color === "red") {
+            bar.style.background = "linear-gradient(90deg,#ef4444,#f87171)";
+            lvl.style.cssText = "font-size:10px;font-family:monospace;font-weight:700;padding:3px 10px;border-radius:8px;background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4)";
+            act.style.color = "#fca5a5";
+        } else if (data.color === "yellow") {
+            bar.style.background = "linear-gradient(90deg,#f59e0b,#fbbf24)";
+            lvl.style.cssText = "font-size:10px;font-family:monospace;font-weight:700;padding:3px 10px;border-radius:8px;background:rgba(245,158,11,0.2);color:#fcd34d;border:1px solid rgba(245,158,11,0.4)";
+            act.style.color = "#fcd34d";
+        } else {
+            bar.style.background = "linear-gradient(90deg,#10b981,#34d399)";
+            lvl.style.cssText = "font-size:10px;font-family:monospace;font-weight:700;padding:3px 10px;border-radius:8px;background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.4)";
+            act.style.color = "#6ee7b7";
+        }
+
+        document.getElementById("threatFlags").innerHTML = (data.flags || []).map(function(f) {
+            return '<span style="background:rgba(30,41,59,0.8);border:1px solid rgba(34,211,238,0.2);color:#67e8f9;padding:3px 8px;border-radius:8px;font-size:10px;">' + f + '</span>';
+        }).join("") || '<span style="color:#64748b;">None detected</span>';
+
+        fetchLogs();
+    } catch (e) {
+        alert("Server error. Is backend running?");
+    } finally {
+        btn.textContent = "Analyze Threat Pattern";
+        btn.disabled = false;
+    }
+}
+
+fetchLogs();
+</script>
+</body>
+</html>
